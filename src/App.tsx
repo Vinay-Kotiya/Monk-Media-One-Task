@@ -229,9 +229,7 @@ function Header() {
         >
           <BrandMark />
 
-          <span className="brand-name">
-            Monk Media <em>One</em>
-          </span>
+          <span className="brand-name">Monk Media One</span>
         </a>
 
         {/* Desktop navigation */}
