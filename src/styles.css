@@ -7934,3 +7934,824 @@ h2 em {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ==========================================
+   TRUSTED BY — MONK MEDIA ONE
+   ========================================== */
+
+.trusted-by {
+  --trust-bg: #080809;
+  --trust-text: #f7f7f8;
+  --trust-muted: #a0a0a8;
+  --trust-border: rgba(255, 255, 255, 0.1);
+  --trust-yellow: #ffc44d;
+  --trust-blue: #5276ff;
+  --trust-coral: #ff5d65;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(76px, 8vw, 110px) 0;
+  color: var(--trust-text);
+  background: var(--trust-bg);
+}
+
+/* Soft ambient lighting */
+
+.trusted-by::before {
+  position: absolute;
+  z-index: -1;
+  top: -190px;
+  left: 50%;
+  width: min(850px, 90vw);
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    rgba(255, 196, 77, 0.055),
+    rgba(82, 118, 255, 0.025) 42%,
+    transparent 72%
+  );
+  content: "";
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.trusted-by::after {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.16) 20%,
+    rgba(255, 255, 255, 0.16) 80%,
+    transparent
+  );
+  content: "";
+}
+
+/* ==========================================
+   SECTION HEADING
+   ========================================== */
+
+.trusted-by .trusted-by-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  opacity: 0;
+  transform: translateY(18px);
+
+  transition:
+    opacity 700ms ease,
+    transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.trusted-by.is-visible .trusted-by-heading {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.trusted-by .eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 25px;
+
+  color: #a1a1aa;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.6;
+  letter-spacing: 0.12em;
+}
+
+.trusted-by .eyebrow > span:first-child {
+  color: var(--trust-yellow);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.trusted-by .trusted-by-eyebrow-line {
+  width: 28px;
+  height: 1px;
+  flex: 0 0 28px;
+  background: linear-gradient(90deg, var(--trust-yellow), var(--trust-blue));
+}
+
+.trusted-by .trusted-by-heading h2 {
+  margin: 0;
+  color: var(--trust-text);
+  font-family: "Manrope", "Inter", sans-serif;
+  font-size: clamp(34px, 4vw, 48px);
+  font-weight: 730;
+  line-height: 1.08;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.trusted-by .trusted-by-heading h2 em {
+  color: #92929b;
+  font-style: normal;
+}
+
+.trusted-by .trusted-by-copy {
+  max-width: 540px;
+  margin: 17px 0 0;
+  color: var(--trust-muted);
+  font-size: 14px;
+  line-height: 1.8;
+  text-wrap: pretty;
+}
+
+/* ==========================================
+   LOGO GRID
+   ========================================== */
+
+.trusted-by .trusted-by-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: clamp(38px, 5vw, 60px);
+}
+
+.trusted-by .trusted-logo {
+  --logo-accent: var(--trust-yellow);
+
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 125px;
+  place-items: center;
+  overflow: hidden;
+
+  border: 1px solid var(--trust-border);
+  border-radius: 10px;
+
+  /* background: rgba(255, 255, 255, 0.012); */
+  background: #080809;
+
+  opacity: 0;
+  transform: translateY(20px) scale(0.985);
+
+  transition:
+    opacity 700ms ease,
+    transform 800ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 250ms ease,
+    background-color 250ms ease;
+}
+
+.trusted-by .trusted-logo--yellow {
+  --logo-accent: var(--trust-yellow);
+}
+
+.trusted-by .trusted-logo--blue {
+  --logo-accent: var(--trust-blue);
+}
+
+.trusted-by .trusted-logo--coral {
+  --logo-accent: var(--trust-coral);
+}
+
+/* Subtle light bloom */
+
+.trusted-by .trusted-logo::before {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    color-mix(in srgb, var(--logo-accent) 11%, transparent),
+    transparent 72%
+  );
+  content: "";
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+/* Fine light sweep */
+
+.trusted-by .trusted-logo::after {
+  position: absolute;
+  top: -50%;
+  left: -70%;
+  width: 45%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.055),
+    transparent
+  );
+  content: "";
+  opacity: 0;
+  transform: rotate(20deg);
+  pointer-events: none;
+}
+
+.trusted-by .trusted-logo-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 125px;
+  place-items: center;
+  padding: 20px;
+  background: #080809;
+  overflow: hidden;
+}
+
+.trusted-by .trusted-logo img {
+  display: block;
+  width: 100%;
+  max-width: 175px;
+  max-height: 65px;
+  object-fit: contain;
+  object-position: center;
+
+  /* Preserve original brand colors. */
+  filter: none;
+  /* Visually blends black pixels into the dark background */
+  mix-blend-mode: screen;
+
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Individual entrance delays */
+
+.trusted-by.is-visible .trusted-logo {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.trusted-by.is-visible .trusted-logo:nth-child(1) {
+  transition-delay: 80ms;
+}
+
+.trusted-by.is-visible .trusted-logo:nth-child(2) {
+  transition-delay: 160ms;
+}
+
+.trusted-by.is-visible .trusted-logo:nth-child(3) {
+  transition-delay: 240ms;
+}
+
+.trusted-by.is-visible .trusted-logo:nth-child(4) {
+  transition-delay: 320ms;
+}
+
+.trusted-by.is-visible .trusted-logo:nth-child(5) {
+  transition-delay: 400ms;
+}
+
+.trusted-by.is-visible .trusted-logo:nth-child(6) {
+  transition-delay: 480ms;
+}
+
+/* Hover lighting */
+
+.trusted-by .trusted-logo:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--logo-accent) 48%, transparent);
+  background-color: rgba(255, 255, 255, 0.025);
+  transition-delay: 0ms;
+}
+
+.trusted-by .trusted-logo:hover::before {
+  opacity: 1;
+}
+
+.trusted-by .trusted-logo:hover::after {
+  opacity: 1;
+  animation: trusted-logo-light-sweep 900ms ease-out forwards;
+}
+
+.trusted-by .trusted-logo:hover img {
+  transform: scale(1.045);
+}
+
+/* Small index in the corner */
+
+.trusted-by .trusted-logo-index {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  bottom: 9px;
+  color: #686871;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+.trusted-by .trusted-logo:hover .trusted-logo-index {
+  opacity: 1;
+}
+
+@keyframes trusted-logo-light-sweep {
+  from {
+    left: -70%;
+  }
+
+  to {
+    left: 140%;
+  }
+}
+
+/* ==========================================
+   SECTION CLOSING LINE
+   ========================================== */
+
+.trusted-by .trusted-by-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  margin-top: 27px;
+  padding-top: 19px;
+  border-top: 1px solid var(--trust-border);
+}
+
+.trusted-by .trusted-by-footer-mark {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: var(--trust-yellow);
+}
+
+.trusted-by .trusted-by-footer p {
+  flex: 1;
+  margin: 0;
+  color: #96969e;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.trusted-by .trusted-by-footer-label {
+  color: #74747d;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8px;
+  line-height: 1.6;
+  letter-spacing: 0.06em;
+  text-align: right;
+}
+
+/* ==========================================
+   TABLET
+   ========================================== */
+
+@media (max-width: 1000px) {
+  .trusted-by .trusted-by-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .trusted-by .trusted-logo,
+  .trusted-by .trusted-logo-inner {
+    min-height: 120px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+   ========================================== */
+
+@media (max-width: 600px) {
+  .trusted-by {
+    padding: 70px 0;
+  }
+
+  .trusted-by .trusted-by-heading h2 {
+    font-size: clamp(32px, 7.8vw, 42px);
+  }
+
+  .trusted-by .trusted-by-copy {
+    max-width: 440px;
+    font-size: 13px;
+  }
+
+  .trusted-by .trusted-by-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 32px;
+  }
+
+  .trusted-by .trusted-logo,
+  .trusted-by .trusted-logo-inner {
+    min-height: 112px;
+  }
+
+  .trusted-by .trusted-logo-inner {
+    padding: 16px;
+  }
+
+  .trusted-by .trusted-logo img {
+    max-width: 155px;
+    max-height: 58px;
+  }
+
+  .trusted-by .trusted-by-footer {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .trusted-by .trusted-by-footer p {
+    flex-basis: calc(100% - 20px);
+  }
+
+  .trusted-by .trusted-by-footer-label {
+    width: 100%;
+    margin-left: 16px;
+    text-align: left;
+  }
+}
+
+/* ==========================================
+   SMALL MOBILE
+   ========================================== */
+
+@media (max-width: 360px) {
+  .trusted-by .trusted-logo,
+  .trusted-by .trusted-logo-inner {
+    min-height: 100px;
+  }
+
+  .trusted-by .trusted-logo-inner {
+    padding: 12px;
+  }
+
+  .trusted-by .trusted-logo img {
+    max-height: 50px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .trusted-by .trusted-by-heading,
+  .trusted-by .trusted-logo {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .trusted-by .trusted-logo::after {
+    display: none;
+  }
+
+  .trusted-by .trusted-logo:hover {
+    transform: none;
+  }
+}
+
+/* ==========================================
+   HERO ENTRANCE — TYPOGRAPHY
+   ========================================== */
+
+.hero--refined .hero-title-line-mask {
+  display: block;
+  overflow: hidden;
+
+  /* Prevent clipping of the bottom of letters */
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.hero--refined .hero-title-line,
+.hero--refined .hero-title-line-mask > .hero-title-accent {
+  display: block;
+  will-change: transform, opacity;
+}
+
+.hero--refined .hero-title-line-mask > .hero-title-accent {
+  width: fit-content;
+}
+
+/* ==========================================
+   ORBITAL MOTION
+   ========================================== */
+
+.hero--refined .hero-orbit--outer {
+  animation: hero-orbit-outer 55s linear infinite;
+  will-change: transform;
+}
+
+.hero--refined .hero-orbit--inner {
+  animation: hero-orbit-inner 70s linear infinite;
+  will-change: transform;
+}
+
+@keyframes hero-orbit-outer {
+  from {
+    transform: translate(-50%, -50%) rotate(-25deg) scaleY(0.88);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(335deg) scaleY(0.88);
+  }
+}
+
+@keyframes hero-orbit-inner {
+  from {
+    transform: translate(-50%, -50%) rotate(32deg) scaleY(0.88);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(-328deg) scaleY(0.88);
+  }
+}
+
+/* ==========================================
+   ONE-TIME LIGHT SWEEP
+   ========================================== */
+
+.hero--refined .hero-stage::after {
+  position: absolute;
+  z-index: 3;
+  top: -15%;
+  left: -100%;
+  width: 38%;
+  height: 130%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.035) 35%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(82, 118, 255, 0.07) 65%,
+    transparent
+  );
+
+  content: "";
+  pointer-events: none;
+  transform: skewX(-18deg);
+
+  animation: hero-stage-light-sweep 1.5s 0.85s ease-out both;
+}
+
+@keyframes hero-stage-light-sweep {
+  from {
+    left: -100%;
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  to {
+    left: 140%;
+    opacity: 0;
+  }
+}
+
+/* ==========================================
+   PERFORMANCE AND ACCESSIBILITY
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero--refined .hero-orbit--outer,
+  .hero--refined .hero-orbit--inner,
+  .hero--refined .hero-stage::after {
+    animation: none !important;
+  }
+
+  .hero--refined .hero-title-line,
+  .hero--refined .hero-title-accent {
+    will-change: auto;
+  }
+}
+
+/* ==========================================
+   PROBLEM — SCROLL-TRIGGERED MOTION
+   ========================================== */
+
+/* Clip each headline line for the upward reveal. */
+
+.problem--editorial .problem-title-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.problem--editorial .problem-title-mask > span,
+.problem--editorial .problem-title-mask > em {
+  display: block;
+  will-change: transform, opacity;
+}
+
+/* Keep the existing split heading layout intact. */
+
+.problem--editorial .problem-intro-grid h2 {
+  min-width: 0;
+}
+
+.problem--editorial .problem-title-mask > em {
+  font-style: normal;
+}
+
+/* ==========================================
+   FRAGMENTED SYSTEMS — SEQUENTIAL ASSEMBLY
+   ========================================== */
+
+.problem--editorial.is-visible .problem-visual--fragmented > span {
+  animation: problem-fragment-assemble 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.problem--editorial.is-visible .problem-visual--fragmented > span:nth-child(1) {
+  animation-delay: 150ms;
+}
+
+.problem--editorial.is-visible .problem-visual--fragmented > span:nth-child(2) {
+  animation-delay: 230ms;
+}
+
+.problem--editorial.is-visible .problem-visual--fragmented > span:nth-child(3) {
+  animation-delay: 310ms;
+}
+
+.problem--editorial.is-visible .problem-visual--fragmented > span:nth-child(4) {
+  animation-delay: 390ms;
+}
+
+.problem--editorial.is-visible .problem-visual--fragmented > span:nth-child(5) {
+  animation-delay: 470ms;
+}
+
+.problem--editorial.is-visible .problem-visual--fragmented > span:nth-child(6) {
+  animation-delay: 550ms;
+}
+
+@keyframes problem-fragment-assemble {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* ==========================================
+   DATA BOUNDARIES — CONTROLLED PULSE
+   ========================================== */
+
+.problem--editorial.is-visible
+  .problem-visual--boundaries
+  .boundary-ring--outer {
+  animation: problem-ring-reveal 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.problem--editorial.is-visible
+  .problem-visual--boundaries
+  .boundary-ring--middle {
+  animation: problem-ring-reveal 800ms 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.problem--editorial.is-visible
+  .problem-visual--boundaries
+  .boundary-ring--inner {
+  animation: problem-ring-reveal 700ms 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.problem--editorial.is-visible .problem-visual--boundaries .boundary-core {
+  animation: problem-core-pulse 900ms 380ms ease-out both;
+}
+
+@keyframes problem-ring-reveal {
+  from {
+    opacity: 0;
+    scale: 0.72;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes problem-core-pulse {
+  0% {
+    opacity: 0;
+    scale: 0.3;
+  }
+
+  65% {
+    opacity: 1;
+    scale: 1.3;
+  }
+
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* ==========================================
+   WORKFLOW — CONNECTION LINES REVEAL
+   ========================================== */
+
+.problem--editorial.is-visible .problem-visual--flow .flow-line {
+  animation: problem-flow-line-reveal 850ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.problem--editorial.is-visible .problem-visual--flow .flow-line--one {
+  animation-delay: 160ms;
+}
+
+.problem--editorial.is-visible .problem-visual--flow .flow-line--two {
+  animation-delay: 300ms;
+}
+
+.problem--editorial.is-visible .problem-visual--flow .flow-line--three {
+  animation-delay: 440ms;
+}
+
+.problem--editorial.is-visible .problem-visual--flow .flow-node {
+  animation: problem-flow-node-reveal 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.problem--editorial.is-visible .problem-visual--flow .flow-node--one {
+  animation-delay: 100ms;
+}
+
+.problem--editorial.is-visible .problem-visual--flow .flow-node--two {
+  animation-delay: 320ms;
+}
+
+.problem--editorial.is-visible .problem-visual--flow .flow-node--three {
+  animation-delay: 540ms;
+}
+
+@keyframes problem-flow-line-reveal {
+  from {
+    opacity: 0;
+    scale: 0.3 1;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1 1;
+  }
+}
+
+@keyframes problem-flow-node-reveal {
+  from {
+    opacity: 0;
+    scale: 0.65;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* ==========================================
+   TRANSITION STATEMENT
+   ========================================== */
+
+.problem--editorial .problem-transition-mark {
+  transition:
+    border-color 250ms ease,
+    color 250ms ease;
+}
+
+.problem--editorial .problem-transition:hover .problem-transition-mark {
+  border-color: rgba(255, 196, 77, 0.55);
+  color: var(--brand-yellow);
+}
+
+/* ==========================================
+   REDUCED MOTION
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .problem--editorial .problem-title-mask > span,
+  .problem--editorial .problem-title-mask > em {
+    will-change: auto;
+  }
+
+  .problem--editorial.is-visible .problem-visual--fragmented > span,
+  .problem--editorial.is-visible .problem-visual--boundaries .boundary-ring,
+  .problem--editorial.is-visible .problem-visual--boundaries .boundary-core,
+  .problem--editorial.is-visible .problem-visual--flow .flow-line,
+  .problem--editorial.is-visible .problem-visual--flow .flow-node {
+    animation: none !important;
+  }
+}

@@ -2,7 +2,324 @@ import { useEffect, useRef, useState } from "react";
 import { FaSquareInstagram } from "react-icons/fa6";
 import * as THREE from "three";
 
+import {
+  motion,
+  MotionConfig,
+  useInView,
+  useReducedMotion,
+} from "framer-motion";
+import type { Variants } from "framer-motion";
+
 const site = "https://monkmediaone.tech";
+
+const heroStagger: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren: 0.12,
+      staggerChildren: 0.12,
+    },
+  },
+};
+
+const heroFadeUp: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 22,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.72,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const heroTitleStagger: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren: 0.04,
+      staggerChildren: 0.13,
+    },
+  },
+};
+
+const heroTitleLine: Variants = {
+  hidden: {
+    y: "110%",
+    opacity: 0,
+  },
+  visible: {
+    y: "0%",
+    opacity: 1,
+    transition: {
+      duration: 0.9,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const heroVisualReveal: Variants = {
+  hidden: {
+    opacity: 0,
+    x: 38,
+    scale: 0.94,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: {
+      duration: 1.15,
+      delay: 0.25,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const heroImmediate: Variants = {
+  hidden: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0,
+    },
+  },
+};
+
+const heroImmediateStagger: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      duration: 0,
+      staggerChildren: 0,
+      delayChildren: 0,
+    },
+  },
+};
+
+const problemContainerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.16,
+      delayChildren: 0.08,
+    },
+  },
+};
+
+const problemRevealVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 24,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.75,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const problemTitleLineVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: "110%",
+  },
+  visible: {
+    opacity: 1,
+    y: "0%",
+    transition: {
+      duration: 0.85,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const problemCardVariants: Variants = {
+  hidden: (index: number) => ({
+    opacity: 0,
+    x: index === 0 ? -38 : index === 2 ? 38 : 0,
+    y: index === 1 ? 30 : 15,
+    scale: 0.985,
+  }),
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+// ==========================================
+// MONK MEDIA ONE — SHARED MOTION SYSTEM
+// ==========================================
+
+const motionEase = [0.22, 1, 0.36, 1] as const;
+
+const motionVariants: Record<string, Variants> = {
+  // Parent: coordinates the entrance of child elements.
+  section: {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.05,
+      },
+    },
+  },
+
+  // Nested grids: slightly slower stagger for individual cards.
+  stagger: {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.12,
+        delayChildren: 0.04,
+      },
+    },
+  },
+
+  // Default: elegant upward reveal.
+  fadeUp: {
+    hidden: {
+      opacity: 0,
+      y: 24,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.7,
+        ease: motionEase,
+      },
+    },
+  },
+
+  // Headings and larger visual blocks.
+  fadeIn: {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.85,
+        ease: "easeOut",
+      },
+    },
+  },
+
+  // Small illustrations, icons and visual accents.
+  scaleIn: {
+    hidden: {
+      opacity: 0,
+      scale: 0.92,
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.7,
+        ease: motionEase,
+      },
+    },
+  },
+
+  // Alternating entrance directions for cards.
+  directionalCard: {
+    hidden: (index: number = 0) => ({
+      opacity: 0,
+      x: index % 3 === 0 ? -28 : index % 3 === 2 ? 28 : 0,
+      y: index % 3 === 1 ? 26 : 16,
+    }),
+
+    visible: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+      transition: {
+        duration: 0.75,
+        ease: motionEase,
+      },
+    },
+  },
+
+  // Abstract portfolio visuals.
+  visual: {
+    hidden: {
+      opacity: 0,
+      scale: 0.96,
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        ease: motionEase,
+        staggerChildren: 0.07,
+        delayChildren: 0.1,
+      },
+    },
+  },
+
+  // Individual decorative shapes inside WorkVisual.
+  visualPart: {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.45,
+        ease: "easeOut",
+      },
+    },
+  },
+};
+
+const revealViewport = {
+  once: true,
+  amount: 0.15,
+  margin: "0px 0px -35px 0px",
+} as const;
+
+const ctaLineVariants: Variants = {
+  hidden: (index: number) => ({
+    opacity: 0,
+    scaleY: 0.05,
+    x: index === 0 ? -24 : index === 2 ? 24 : 0,
+    y: index === 1 ? -22 : 0,
+  }),
+
+  visible: (index: number) => ({
+    opacity: 0.78,
+    scaleY: 1,
+    x: 0,
+    y: 0,
+    transition: {
+      duration: 1.15,
+      delay: 0.15 + index * 0.24,
+      ease: motionEase,
+    },
+  }),
+};
 
 const navItems = [
   { label: "Services", href: `${site}/services/` },
@@ -609,19 +926,49 @@ function Hero() {
     "Real Estate",
   ];
 
+  const shouldReduceMotion = useReducedMotion() ?? false;
+
+  const containerVariants = shouldReduceMotion
+    ? heroImmediateStagger
+    : heroStagger;
+
+  const itemVariants = shouldReduceMotion ? heroImmediate : heroFadeUp;
+
+  const titleContainerVariants = shouldReduceMotion
+    ? heroImmediateStagger
+    : heroTitleStagger;
+
+  const titleLineVariants = shouldReduceMotion ? heroImmediate : heroTitleLine;
+
+  const visualVariants = shouldReduceMotion ? heroImmediate : heroVisualReveal;
+
   return (
     <section
       className="hero hero--refined"
       id="top"
       aria-labelledby="hero-title"
     >
-      {/* Subtle background texture */}
-      <div className="hero-gridlines" aria-hidden="true" />
+      {/* Background grid fades in first */}
+      <motion.div
+        className="hero-gridlines"
+        aria-hidden="true"
+        initial={shouldReduceMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 0.55 }}
+        transition={{
+          duration: shouldReduceMotion ? 0 : 1.2,
+          ease: "easeOut",
+        }}
+      />
 
-      <div className="hero-grid shell">
-        {/* LEFT: Copy and conversion */}
-        <div className="hero-content">
-          <div className="hero-kicker">
+      <motion.div
+        className="hero-grid shell"
+        variants={containerVariants}
+        initial={shouldReduceMotion ? false : "hidden"}
+        animate="visible"
+      >
+        {/* LEFT: Staggered text and CTA reveal */}
+        <motion.div className="hero-content" variants={containerVariants}>
+          <motion.div className="hero-kicker" variants={itemVariants}>
             <span className="hero-kicker-index">01</span>
             <span className="hero-kicker-rule" aria-hidden="true" />
             <span>PRIVATE AI</span>
@@ -629,141 +976,415 @@ function Hero() {
               /
             </span>
             <span>AUTONOMOUS SYSTEMS</span>
-          </div>
+          </motion.div>
 
-          <h1 className="hero-title" id="hero-title">
-            <span>Intelligence,</span>
-            <span>without giving up</span>
-            <span className="hero-title-accent">control.</span>
-          </h1>
+          {/* Each line reveals upward inside a clipping mask */}
+          <motion.h1
+            className="hero-title"
+            id="hero-title"
+            variants={titleContainerVariants}
+          >
+            <span className="hero-title-line-mask">
+              <motion.span
+                className="hero-title-line"
+                variants={titleLineVariants}
+              >
+                Intelligence,
+              </motion.span>
+            </span>
 
-          <p className="hero-copy">
+            <span className="hero-title-line-mask">
+              <motion.span
+                className="hero-title-line"
+                variants={titleLineVariants}
+              >
+                without giving up
+              </motion.span>
+            </span>
+
+            <span className="hero-title-line-mask">
+              <motion.span
+                className="hero-title-accent"
+                variants={titleLineVariants}
+              >
+                control.
+              </motion.span>
+            </span>
+          </motion.h1>
+
+          <motion.p className="hero-copy" variants={itemVariants}>
             Build AI around your business—not the other way around. We engineer
             private AI infrastructure and intelligent workflows around your
             data, systems, and operational needs.
-          </p>
+          </motion.p>
 
-          <div className="hero-actions">
-            <a
+          <motion.div className="hero-actions" variants={containerVariants}>
+            <motion.a
               className="button hero-button hero-button--primary"
               href={`${site}/contact/`}
+              variants={itemVariants}
+              whileHover={shouldReduceMotion ? undefined : { y: -2 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
             >
               <span>Book a Discovery Call</span>
+
               <span className="hero-button-icon" aria-hidden="true">
                 <Arrow />
               </span>
-            </a>
+            </motion.a>
 
-            <a
+            <motion.a
               className="button button-secondary hero-button hero-button--secondary"
               href="#services"
+              variants={itemVariants}
+              whileHover={shouldReduceMotion ? undefined : { y: -2 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
             >
               <span>Explore capabilities</span>
+
               <span className="hero-button-icon" aria-hidden="true">
                 ↘
               </span>
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
 
-          <div className="hero-audience">
+          <motion.div className="hero-audience" variants={itemVariants}>
             <div className="hero-audience-heading">
               <span className="hero-audience-mark" aria-hidden="true" />
               <p>BUILT FOR REAL-WORLD BUSINESS</p>
             </div>
 
             <div className="hero-audience-list">
-              {audiences.map((audience) => (
-                <span key={audience}>{audience}</span>
+              {audiences.map((audience, index) => (
+                <motion.span
+                  key={audience}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: shouldReduceMotion ? 0 : 0.4,
+                    delay: shouldReduceMotion ? 0 : 0.75 + index * 0.07,
+                    ease: "easeOut",
+                  }}
+                >
+                  {audience}
+                </motion.span>
               ))}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        {/* RIGHT: Existing custom 3D component */}
-        <div className="hero-visual" aria-hidden="true">
-          <div className="hero-visual-topline">
+        {/* RIGHT: Cinematic 3D visual entrance */}
+        <motion.div
+          className="hero-visual"
+          aria-hidden="true"
+          variants={visualVariants}
+        >
+          <motion.div className="hero-visual-topline" variants={itemVariants}>
             <span className="hero-visual-index">MMO / CORE-01</span>
 
             <span className="hero-visual-label">
               <span className="hero-visual-indicator" />
               PRIVATE AI SYSTEMS
             </span>
-          </div>
+          </motion.div>
 
-          <div className="hero-stage">
+          <motion.div className="hero-stage" variants={itemVariants}>
             <div className="hero-stage-grid" />
 
-            {/* Decorative orbital guides */}
+            {/* Orbital guides use the continuous CSS animation below */}
             <div className="hero-orbit hero-orbit--outer" />
             <div className="hero-orbit hero-orbit--inner" />
             <div className="hero-stage-crosshair" />
 
-            {/* Keep your existing 3D implementation */}
+            {/* Preserve your existing Three.js / React Three Fiber component */}
             <div className="hero-core-mount">
               <SovereignCore />
             </div>
 
-            {/* Small annotations, not another technology diagram */}
-            <div className="hero-scene-note hero-scene-note--top">
+            <motion.div
+              className="hero-scene-note hero-scene-note--top"
+              variants={itemVariants}
+            >
               <span>01 / ARCHITECTURE</span>
               <span>Private by design</span>
-            </div>
+            </motion.div>
 
-            <div className="hero-scene-note hero-scene-note--bottom">
+            <motion.div
+              className="hero-scene-note hero-scene-note--bottom"
+              variants={itemVariants}
+            >
               <span>02 / INTELLIGENCE</span>
               <span>Built around your world</span>
-            </div>
+            </motion.div>
 
             <span className="hero-scene-cross hero-scene-cross--one" />
             <span className="hero-scene-cross hero-scene-cross--two" />
-          </div>
+          </motion.div>
 
-          <div className="hero-visual-footer">
+          <motion.div className="hero-visual-footer" variants={itemVariants}>
             <span>MODELS / AGENTS / WORKFLOWS</span>
             <span>ENGINEERED WITH INTENT ↗</span>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        </motion.div>
+      </motion.div>
 
-      {/* Bottom navigation cue */}
-      <a
+      {/* Scroll cue enters last */}
+      <motion.a
         className="hero-scroll"
         href="#services"
         aria-label="Scroll to explore our capabilities"
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: shouldReduceMotion ? 0 : 0.65,
+          delay: shouldReduceMotion ? 0 : 1.15,
+          ease: "easeOut",
+        }}
       >
         <span>SCROLL TO EXPLORE</span>
         <span className="hero-scroll-line" aria-hidden="true" />
         <span className="hero-scroll-arrow" aria-hidden="true">
           ↓
         </span>
-      </a>
+      </motion.a>
     </section>
   );
 }
 
+// function Problem() {
+//   return (
+//     <section
+//       className="problem section problem--editorial"
+//       id="about"
+//       aria-labelledby="problem-title"
+//     >
+//       <div className="shell problem-shell">
+//         <div className="problem-intro">
+//           <p className="eyebrow problem-eyebrow">
+//             <span>02</span>
+//             <span className="problem-eyebrow-line" aria-hidden="true" />
+//             THE REAL CHALLENGE
+//           </p>
+
+//           <div className="problem-intro-grid">
+//             <h2 id="problem-title">
+//               AI isn’t the hard part.
+//               <br />
+//               <em>Making it work together is.</em>
+//             </h2>
+
+//             <div className="problem-intro-copy">
+//               <span className="problem-copy-index">
+//                 THE GAP BETWEEN TOOLS AND OUTCOMES
+//               </span>
+
+//               <p>
+//                 Adding AI tools is easy. Making them work securely and reliably
+//                 across your business is harder. Disconnected systems, unclear
+//                 data boundaries, and repetitive work can keep promising
+//                 technology from delivering its full value.
+//               </p>
+//             </div>
+//           </div>
+//         </div>
+
+//         <div className="problem-cards">
+//           <article className="problem-card problem-card--fragmented">
+//             <div className="problem-card-top">
+//               <span className="problem-card-number">01</span>
+//               <span className="problem-card-category">FRAGMENTATION</span>
+//             </div>
+
+//             <div
+//               className="problem-visual problem-visual--fragmented"
+//               aria-hidden="true"
+//             >
+//               <span />
+//               <span />
+//               <span />
+//               <span />
+//               <span />
+//               <span />
+//             </div>
+
+//             <div className="problem-card-copy">
+//               <h3>
+//                 Intelligence
+//                 <br />
+//                 in silos.
+//               </h3>
+
+//               <p>
+//                 Disconnected tools create disconnected workflows. Teams lose
+//                 context, repeat tasks, and spend time moving information instead
+//                 of acting on it.
+//               </p>
+//             </div>
+
+//             <div className="problem-card-footer">
+//               <span>01 / 03</span>
+//               <span className="problem-card-indicator" />
+//             </div>
+//           </article>
+
+//           <article className="problem-card problem-card--boundaries">
+//             <div className="problem-card-top">
+//               <span className="problem-card-number">02</span>
+//               <span className="problem-card-category">DATA CONTROL</span>
+//             </div>
+
+//             <div
+//               className="problem-visual problem-visual--boundaries"
+//               aria-hidden="true"
+//             >
+//               <span className="boundary-ring boundary-ring--outer" />
+//               <span className="boundary-ring boundary-ring--middle" />
+//               <span className="boundary-ring boundary-ring--inner" />
+//               <span className="boundary-core" />
+//             </div>
+
+//             <div className="problem-card-copy">
+//               <h3>
+//                 Unclear
+//                 <br />
+//                 boundaries.
+//               </h3>
+
+//               <p>
+//                 Sensitive business knowledge needs thoughtful access controls,
+//                 deployment decisions, and governance as AI becomes part of
+//                 everyday operations.
+//               </p>
+//             </div>
+
+//             <div className="problem-card-footer">
+//               <span>02 / 03</span>
+//               <span className="problem-card-indicator" />
+//             </div>
+//           </article>
+
+//           <article className="problem-card problem-card--manual">
+//             <div className="problem-card-top">
+//               <span className="problem-card-number">03</span>
+//               <span className="problem-card-category">
+//                 OPERATIONAL FRICTION
+//               </span>
+//             </div>
+
+//             <div
+//               className="problem-visual problem-visual--flow"
+//               aria-hidden="true"
+//             >
+//               <span className="flow-node flow-node--one" />
+//               <span className="flow-node flow-node--two" />
+//               <span className="flow-node flow-node--three" />
+//               <span className="flow-line flow-line--one" />
+//               <span className="flow-line flow-line--two" />
+//               <span className="flow-line flow-line--three" />
+//             </div>
+
+//             <div className="problem-card-copy">
+//               <h3>
+//                 Work that
+//                 <br />
+//                 stays manual.
+//               </h3>
+
+//               <p>
+//                 Document handling, data entry, handoffs, and follow-ups consume
+//                 valuable time when routine processes cannot communicate or
+//                 coordinate.
+//               </p>
+//             </div>
+
+//             <div className="problem-card-footer">
+//               <span>03 / 03</span>
+//               <span className="problem-card-indicator" />
+//             </div>
+//           </article>
+//         </div>
+
+//         <div className="problem-transition">
+//           <span className="problem-transition-mark" aria-hidden="true">
+//             ↘
+//           </span>
+
+//           <p>
+//             The answer isn’t another tool.
+//             <strong>
+//               {" "}
+//               It’s intelligence designed around how your business works.
+//             </strong>
+//           </p>
+
+//           <span className="problem-transition-label">A BETTER WAY FORWARD</span>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
+
 function Problem() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, {
+    once: true,
+    amount: 0.18,
+    margin: "0px 0px -40px 0px",
+  });
+
+  const shouldReduceMotion = useReducedMotion() ?? false;
+  const animationState = shouldReduceMotion || isInView ? "visible" : "hidden";
+
   return (
     <section
-      className="problem section problem--editorial"
+      ref={sectionRef}
+      className={`problem section problem--editorial ${
+        isInView ? "is-visible" : ""
+      }`}
       id="about"
       aria-labelledby="problem-title"
     >
-      <div className="shell problem-shell">
-        <div className="problem-intro">
-          <p className="eyebrow problem-eyebrow">
+      <motion.div
+        className="shell problem-shell"
+        variants={problemContainerVariants}
+        initial={shouldReduceMotion ? false : "hidden"}
+        animate={animationState}
+      >
+        <motion.div
+          className="problem-intro"
+          variants={problemContainerVariants}
+        >
+          <motion.p
+            className="eyebrow problem-eyebrow"
+            variants={problemRevealVariants}
+          >
             <span>02</span>
             <span className="problem-eyebrow-line" aria-hidden="true" />
             THE REAL CHALLENGE
-          </p>
+          </motion.p>
 
-          <div className="problem-intro-grid">
-            <h2 id="problem-title">
-              AI isn’t the hard part.
-              <br />
-              <em>Making it work together is.</em>
-            </h2>
+          <motion.div
+            className="problem-intro-grid"
+            variants={problemContainerVariants}
+          >
+            <motion.h2 id="problem-title" variants={problemContainerVariants}>
+              <span className="problem-title-mask">
+                <motion.span variants={problemTitleLineVariants}>
+                  AI isn’t the hard part.
+                </motion.span>
+              </span>
 
-            <div className="problem-intro-copy">
+              <span className="problem-title-mask">
+                <motion.em variants={problemTitleLineVariants}>
+                  Making it work together is.
+                </motion.em>
+              </span>
+            </motion.h2>
+
+            <motion.div
+              className="problem-intro-copy"
+              variants={problemRevealVariants}
+            >
               <span className="problem-copy-index">
                 THE GAP BETWEEN TOOLS AND OUTCOMES
               </span>
@@ -774,12 +1395,20 @@ function Problem() {
                 data boundaries, and repetitive work can keep promising
                 technology from delivering its full value.
               </p>
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
 
-        <div className="problem-cards">
-          <article className="problem-card problem-card--fragmented">
+        <motion.div
+          className="problem-cards"
+          variants={problemContainerVariants}
+        >
+          <motion.article
+            className="problem-card problem-card--fragmented"
+            custom={0}
+            variants={problemCardVariants}
+            whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+          >
             <div className="problem-card-top">
               <span className="problem-card-number">01</span>
               <span className="problem-card-category">FRAGMENTATION</span>
@@ -815,9 +1444,14 @@ function Problem() {
               <span>01 / 03</span>
               <span className="problem-card-indicator" />
             </div>
-          </article>
+          </motion.article>
 
-          <article className="problem-card problem-card--boundaries">
+          <motion.article
+            className="problem-card problem-card--boundaries"
+            custom={1}
+            variants={problemCardVariants}
+            whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+          >
             <div className="problem-card-top">
               <span className="problem-card-number">02</span>
               <span className="problem-card-category">DATA CONTROL</span>
@@ -851,9 +1485,14 @@ function Problem() {
               <span>02 / 03</span>
               <span className="problem-card-indicator" />
             </div>
-          </article>
+          </motion.article>
 
-          <article className="problem-card problem-card--manual">
+          <motion.article
+            className="problem-card problem-card--manual"
+            custom={2}
+            variants={problemCardVariants}
+            whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+          >
             <div className="problem-card-top">
               <span className="problem-card-number">03</span>
               <span className="problem-card-category">
@@ -891,10 +1530,13 @@ function Problem() {
               <span>03 / 03</span>
               <span className="problem-card-indicator" />
             </div>
-          </article>
-        </div>
+          </motion.article>
+        </motion.div>
 
-        <div className="problem-transition">
+        <motion.div
+          className="problem-transition"
+          variants={problemRevealVariants}
+        >
           <span className="problem-transition-mark" aria-hidden="true">
             ↘
           </span>
@@ -908,12 +1550,12 @@ function Problem() {
           </p>
 
           <span className="problem-transition-label">A BETTER WAY FORWARD</span>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }
-
+// --------------
 function Approach() {
   const approach = [
     {
@@ -943,45 +1585,63 @@ function Approach() {
   ];
 
   return (
-    <section
+    <motion.section
       className="approach section approach--refined"
       id="approach"
       aria-labelledby="approach-title"
+      variants={motionVariants.section}
+      initial="hidden"
+      whileInView="visible"
+      viewport={revealViewport}
     >
-      <div className="shell">
-        <div className="approach-intro">
-          <p className="eyebrow">
+      <motion.div className="shell" variants={motionVariants.stagger}>
+        <motion.div
+          className="approach-intro"
+          variants={motionVariants.stagger}
+        >
+          <motion.p className="eyebrow" variants={motionVariants.fadeUp}>
             <span>03</span>
             <span className="approach-eyebrow-line" aria-hidden="true" />
             HOW WE WORK
-          </p>
+          </motion.p>
 
           <div className="approach-intro-grid">
-            <h2 id="approach-title">
+            <motion.h2 id="approach-title" variants={motionVariants.fadeUp}>
               Good AI starts with
               <br />
               <em>the right problem.</em>
-            </h2>
+            </motion.h2>
 
-            <p>
+            <motion.p variants={motionVariants.fadeUp}>
               Technology comes second. We start with the business challenge,
               design an architecture around it, and build a solution that fits
               the way your organization works.
-            </p>
+            </motion.p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="approach-steps">
-          {approach.map((step) => (
-            <article className="approach-step" key={step.n}>
+        <motion.div
+          className="approach-steps"
+          variants={motionVariants.stagger}
+        >
+          {approach.map((step, index) => (
+            <motion.article
+              className="approach-step"
+              key={step.n}
+              custom={index}
+              variants={motionVariants.directionalCard}
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.25 }}
+            >
               <div className="approach-step-top">
                 <span className="approach-step-number">{step.n}</span>
                 <span className="approach-step-tag">{step.tag}</span>
               </div>
 
-              <div
+              <motion.div
                 className={`approach-visual approach-visual--${step.visual}`}
                 aria-hidden="true"
+                variants={motionVariants.scaleIn}
               >
                 <span className="approach-visual-shape shape-one" />
                 <span className="approach-visual-shape shape-two" />
@@ -989,7 +1649,7 @@ function Approach() {
                 <span className="approach-visual-shape shape-four" />
                 <span className="approach-visual-shape shape-five" />
                 <span className="approach-visual-shape shape-six" />
-              </div>
+              </motion.div>
 
               <div className="approach-step-copy">
                 <h3>{step.title}</h3>
@@ -1001,11 +1661,14 @@ function Approach() {
                 <span>PHASE {step.n}</span>
                 <span aria-hidden="true">↗</span>
               </div>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="approach-outcome">
+        <motion.div
+          className="approach-outcome"
+          variants={motionVariants.fadeUp}
+        >
           <span className="approach-outcome-mark" aria-hidden="true">
             ↳
           </span>
@@ -1013,58 +1676,73 @@ function Approach() {
             <strong>One connected process.</strong> From the first question to a
             system built around real business needs.
           </p>
-        </div>
-      </div>
-    </section>
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 }
 function ServiceIcon({ type }: { type: string }) {
   return (
-    <span className={`service-icon ${type}`} aria-hidden="true">
+    <motion.span
+      className={`service-icon ${type}`}
+      aria-hidden="true"
+      variants={motionVariants.scaleIn}
+    >
       <i />
       <b />
       <em />
-    </span>
+    </motion.span>
   );
 }
 
 function Services() {
   return (
-    <section
+    <motion.section
       className="services section services--bento"
       id="services"
       aria-labelledby="services-title"
+      variants={motionVariants.section}
+      initial="hidden"
+      whileInView="visible"
+      viewport={revealViewport}
     >
-      <div className="shell">
-        <div className="services-intro">
-          <p className="eyebrow">
+      <motion.div className="shell" variants={motionVariants.stagger}>
+        <motion.div
+          className="services-intro"
+          variants={motionVariants.stagger}
+        >
+          <motion.p className="eyebrow" variants={motionVariants.fadeUp}>
             <span>04</span>
             <span className="services-eyebrow-line" aria-hidden="true" />
             WHAT WE BUILD
-          </p>
+          </motion.p>
 
           <div className="services-intro-grid">
-            <h2 id="services-title">
+            <motion.h2 id="services-title" variants={motionVariants.fadeUp}>
               Intelligence engineered
               <br />
               <em>for your business.</em>
-            </h2>
+            </motion.h2>
 
-            <p>
+            <motion.p variants={motionVariants.fadeUp}>
               No one-size-fits-all AI stack. Just purposeful systems, carefully
               selected technologies, and integrations designed around the work
               that matters.
-            </p>
+            </motion.p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="services-grid">
+        <motion.div className="services-grid" variants={motionVariants.stagger}>
           {services.map((service, index) => (
-            <a
+            <motion.a
               href={`${site}/services/`}
               className={`service-card service-${index + 1}`}
               key={service.n}
               aria-label={`Explore ${service.title}`}
+              variants={motionVariants.directionalCard}
+              custom={index}
+              whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.99 }}
             >
               <div className="service-top">
                 <span className="service-number">
@@ -1088,11 +1766,14 @@ function Services() {
                 <small>{service.stack}</small>
                 <span className="service-card-link">EXPLORE SERVICE</span>
               </div>
-            </a>
+            </motion.a>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="services-bottom-note">
+        <motion.div
+          className="services-bottom-note"
+          variants={motionVariants.fadeUp}
+        >
           <span className="services-bottom-mark" aria-hidden="true">
             +
           </span>
@@ -1103,36 +1784,46 @@ function Services() {
               <span aria-hidden="true"> ↗</span>
             </a>
           </p>
-        </div>
-      </div>
-    </section>
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 }
 
 function Differentiators() {
   return (
-    <section
+    <motion.section
       className="differentiators section differentiators--refined"
       id="why-monk"
       aria-labelledby="difference-title"
+      variants={motionVariants.section}
+      initial="hidden"
+      whileInView="visible"
+      viewport={revealViewport}
     >
-      <div className="shell">
-        <div className="difference-top">
+      <motion.div className="shell" variants={motionVariants.stagger}>
+        <motion.div
+          className="difference-top"
+          variants={motionVariants.stagger}
+        >
           <div className="difference-heading">
-            <p className="eyebrow">
+            <motion.p className="eyebrow" variants={motionVariants.fadeUp}>
               <span>05</span>
               <span className="difference-eyebrow-line" aria-hidden="true" />
               WHY MONK
-            </p>
+            </motion.p>
 
-            <h2 id="difference-title">
+            <motion.h2 id="difference-title" variants={motionVariants.fadeUp}>
               Built around business realities.
               <br />
               <em>Engineered with intent.</em>
-            </h2>
+            </motion.h2>
           </div>
 
-          <div className="difference-intro-copy">
+          <motion.div
+            className="difference-intro-copy"
+            variants={motionVariants.fadeUp}
+          >
             <span className="difference-intro-index">BEYOND THE MODEL</span>
 
             <p>
@@ -1140,20 +1831,34 @@ function Differentiators() {
               architecture, thoughtful integration, and engineering decisions
               grounded in the realities of your business.
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="difference-grid">
-          {differentiators.map(([n, title, copy]) => (
-            <article className="difference-card" key={n}>
+        <motion.div
+          className="difference-grid"
+          variants={motionVariants.stagger}
+        >
+          {differentiators.map(([n, title, copy], index) => (
+            <motion.article
+              className="difference-card"
+              key={n}
+              custom={index}
+              variants={motionVariants.directionalCard}
+              whileHover={{ y: -3 }}
+              whileTap={{ scale: 0.995 }}
+            >
               <div className="difference-card-top">
                 <span className="difference-number">{n}</span>
 
-                <span className="difference-card-visual" aria-hidden="true">
+                <motion.span
+                  className="difference-card-visual"
+                  aria-hidden="true"
+                  variants={motionVariants.scaleIn}
+                >
                   <i />
                   <b />
                   <em />
-                </span>
+                </motion.span>
               </div>
 
               <div className="difference-card-content">
@@ -1167,11 +1872,14 @@ function Differentiators() {
                   ↗
                 </span>
               </div>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="difference-closing">
+        <motion.div
+          className="difference-closing"
+          variants={motionVariants.fadeUp}
+        >
           <span className="difference-closing-mark" aria-hidden="true">
             +
           </span>
@@ -1179,42 +1887,63 @@ function Differentiators() {
             <strong>Technology is the means.</strong> Making it useful to your
             business is the point.
           </p>
-        </div>
-      </div>
-    </section>
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 }
 
 function WorkVisual({ index }: { index: number }) {
   return (
-    <div className={`work-visual visual-${index}`} aria-hidden="true">
-      <div className="work-visual-grid" />
+    <motion.div
+      className={`work-visual visual-${index}`}
+      aria-hidden="true"
+      variants={motionVariants.visual}
+    >
+      <motion.div
+        className="work-visual-grid"
+        variants={motionVariants.fadeIn}
+      />
 
-      <span className="work-visual-label">
+      <motion.span
+        className="work-visual-label"
+        variants={motionVariants.visualPart}
+      >
         PROJECT / {String(index).padStart(2, "0")}
-      </span>
+      </motion.span>
 
-      <i />
-      <i />
-      <i />
-      <b />
-      <em />
+      <motion.i variants={motionVariants.visualPart} />
+      <motion.i variants={motionVariants.visualPart} />
+      <motion.i variants={motionVariants.visualPart} />
+      <motion.b variants={motionVariants.visualPart} />
+      <motion.em variants={motionVariants.visualPart} />
 
-      <span className="work-visual-corner work-visual-corner--tl" />
-      <span className="work-visual-corner work-visual-corner--br" />
-    </div>
+      <motion.span
+        className="work-visual-corner work-visual-corner--tl"
+        variants={motionVariants.visualPart}
+      />
+
+      <motion.span
+        className="work-visual-corner work-visual-corner--br"
+        variants={motionVariants.visualPart}
+      />
+    </motion.div>
   );
 }
-
+// ------------------
 function CaseStudies() {
   return (
-    <section
+    <motion.section
       className="case-studies section case-studies--refined"
       id="portfolio"
       aria-labelledby="case-title"
+      variants={motionVariants.section}
+      initial="hidden"
+      whileInView="visible"
+      viewport={revealViewport}
     >
       <div className="shell">
-        <div className="case-intro">
+        <motion.div className="case-intro" variants={motionVariants.fadeUp}>
           <div className="case-heading">
             <p className="eyebrow">
               <span>06</span>
@@ -1228,30 +1957,21 @@ function CaseStudies() {
               <em>business workflows.</em>
             </h2>
           </div>
+        </motion.div>
 
-          <div className="case-intro-copy">
-            <span className="case-intro-index">
-              FROM PROBLEM TO IMPLEMENTATION
-            </span>
-
-            <p>
-              Explore examples of AI and software designed to connect systems,
-              simplify repetitive work, and make business information more
-              useful.
-            </p>
-          </div>
-        </div>
-
-        <div className="case-grid">
+        <motion.div className="case-grid" variants={motionVariants.stagger}>
           {caseStudies.map(([n, title, category, copy], index) => (
-            <a
+            <motion.a
               href={`${site}/portfolio/`}
               key={n}
               className={`case-card case-${index + 1}`}
               aria-label={`Explore portfolio: ${title}`}
+              custom={index}
+              variants={motionVariants.directionalCard}
+              whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.99 }}
             >
               <WorkVisual index={index + 1} />
-
               <div className="case-content">
                 <div className="case-meta">
                   <span className="case-number">{n}</span>
@@ -1267,10 +1987,10 @@ function CaseStudies() {
                     <Arrow diagonal />
                   </span>
                 </div>
-              </div>
-            </a>
+              </div>{" "}
+            </motion.a>
           ))}
-        </div>
+        </motion.div>
 
         <div className="case-footer">
           <p>
@@ -1285,6 +2005,137 @@ function CaseStudies() {
             View the portfolio
             <Arrow />
           </a>
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+function TrustedBy() {
+  const brands = [
+    {
+      name: "MB",
+      file: "mb.webp",
+      accent: "yellow",
+    },
+    {
+      name: "Verity",
+      file: "verity.webp",
+      accent: "coral",
+    },
+    {
+      name: "Malav C. Sheth & Co.",
+      file: "ca.webp",
+      accent: "blue",
+    },
+    {
+      name: "ACS Innovative Automation",
+      file: "acs.webp",
+      accent: "blue",
+    },
+    {
+      name: "Biotane Naturals",
+      file: "ChatGPT.webp",
+      accent: "yellow",
+    },
+    {
+      name: "CosmoGuru",
+      file: "cosmo.webp",
+      accent: "coral",
+    },
+  ] as const;
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section) return;
+
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !("IntersectionObserver" in window)
+    ) {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.15,
+        rootMargin: "0px 0px -35px 0px",
+      },
+    );
+
+    observer.observe(section);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section
+      ref={sectionRef}
+      className={`trusted-by section ${isVisible ? "is-visible" : ""}`}
+      id="trusted-by"
+      aria-labelledby="trusted-by-title"
+    >
+      <div className="shell">
+        <div className="trusted-by-heading">
+          <p className="eyebrow">
+            <span>07</span>
+            <span className="trusted-by-eyebrow-line" aria-hidden="true" />
+            TRUSTED BY
+          </p>
+
+          <h2 id="trusted-by-title">
+            Built around real
+            <br />
+            <em>business needs.</em>
+          </h2>
+
+          <p className="trusted-by-copy">
+            Technology matters most when it solves meaningful problems. We're
+            proud to showcase the businesses and teams connected with our work.
+          </p>
+        </div>
+
+        <div className="trusted-by-grid">
+          {brands.map((brand, index) => (
+            <div
+              className={`trusted-logo trusted-logo--${brand.accent}`}
+              key={brand.file}
+            >
+              <div className="trusted-logo-inner">
+                <img
+                  src={`/brands/${brand.file}`}
+                  alt={brand.name}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+
+              <span className="trusted-logo-index" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="trusted-by-footer">
+          <span className="trusted-by-footer-mark" aria-hidden="true" />
+
+          <p>Technology with purpose. Partnerships built on real work.</p>
+
+          <span className="trusted-by-footer-label">
+            MONK MEDIA ONE / COLLABORATION
+          </span>
         </div>
       </div>
     </section>
@@ -1361,7 +2212,7 @@ function Testimonials() {
             <span>07</span> PERSPECTIVES
           </p> */}
           <p className="eyebrow">
-            <span>07</span>
+            <span>08</span>
             <span className="testimonial-eyebrow-line" aria-hidden="true" />
             PERSPECTIVES
           </p>
@@ -1423,7 +2274,7 @@ function Testimonials() {
     </section>
   );
 }
-
+// -----------
 function Technology() {
   const groups: [string, string[]][] = [
     [
@@ -1443,16 +2294,20 @@ function Technology() {
   ];
 
   return (
-    <section
+    <motion.section
       className="technology section technology--refined"
       id="technology"
       aria-labelledby="technology-title"
+      variants={motionVariants.section}
+      initial="hidden"
+      whileInView="visible"
+      viewport={revealViewport}
     >
-      <div className="shell">
-        <div className="tech-head">
-          <div className="tech-heading">
+      <motion.div className="shell" variants={motionVariants.stagger}>
+        <motion.div className="tech-head" variants={motionVariants.stagger}>
+          <motion.div className="tech-heading" variants={motionVariants.fadeUp}>
             <p className="eyebrow">
-              <span>08</span>
+              <span>09</span>
               <span className="tech-eyebrow-line" aria-hidden="true" />
               THE TOOLS BEHIND THE SYSTEMS
             </p>
@@ -1462,9 +2317,12 @@ function Technology() {
               <br />
               <em>Chosen for the problem.</em>
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="tech-intro-copy">
+          <motion.div
+            className="tech-intro-copy"
+            variants={motionVariants.fadeUp}
+          >
             <span className="tech-intro-label">TECHNOLOGY WITH PURPOSE</span>
 
             <p>
@@ -1472,45 +2330,58 @@ function Technology() {
               every technology has a role in building dependable,
               business-specific AI systems.
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="tech-matrix">
+        <motion.div className="tech-matrix" variants={motionVariants.stagger}>
           {groups.map(([title, items], idx) => (
-            <div className="tech-group" key={title}>
-              <div className="tech-group-heading">
+            <motion.div
+              className="tech-group"
+              key={title}
+              custom={idx}
+              variants={motionVariants.directionalCard}
+            >
+              <motion.div
+                className="tech-group-heading"
+                variants={motionVariants.fadeUp}
+              >
                 <span className="tech-group-number">
                   {String(idx + 1).padStart(2, "0")}
                 </span>
-
                 <h3>{title}</h3>
-              </div>
+              </motion.div>
 
-              <div className="tech-items">
+              <motion.div
+                className="tech-items"
+                variants={motionVariants.stagger}
+              >
                 {items.map((item) => (
-                  <span className="tech-chip" key={item}>
+                  <motion.span
+                    className="tech-chip"
+                    key={item}
+                    variants={motionVariants.scaleIn}
+                    whileHover={{ y: -2 }}
+                  >
                     <span className="tech-chip-dot" aria-hidden="true" />
                     {item}
-                  </span>
+                  </motion.span>
                 ))}
-              </div>
+              </motion.div>
 
               <span className="tech-row-indicator" aria-hidden="true">
                 ↗
               </span>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="tech-footer">
+        <motion.div className="tech-footer" variants={motionVariants.fadeUp}>
           <span className="tech-footer-mark" aria-hidden="true" />
-
           <p>The right technology is the one that serves the problem.</p>
-
           <span className="tech-footer-label">FLEXIBLE BY DESIGN</span>
-        </div>
-      </div>
-    </section>
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 }
 
@@ -1518,52 +2389,65 @@ function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section
+    <motion.section
       className="faq section faq--refined"
       id="faq"
       aria-labelledby="faq-title"
+      variants={motionVariants.section}
+      initial="hidden"
+      whileInView="visible"
+      viewport={revealViewport}
     >
-      <div className="shell faq-layout">
-        <div className="faq-intro">
-          <p className="eyebrow">
-            <span>09</span>
+      <motion.div
+        className="shell faq-layout"
+        variants={motionVariants.stagger}
+      >
+        <motion.div className="faq-intro" variants={motionVariants.stagger}>
+          <motion.p className="eyebrow" variants={motionVariants.fadeUp}>
+            <span>10</span>
             <span className="faq-eyebrow-line" aria-hidden="true" />
             COMMON QUESTIONS
-          </p>
+          </motion.p>
 
-          <h2 id="faq-title">
+          <motion.h2 id="faq-title" variants={motionVariants.fadeUp}>
             Clarity before
             <br />
             <em>complexity.</em>
-          </h2>
+          </motion.h2>
 
-          <p className="faq-intro-copy">
+          <motion.p className="faq-intro-copy" variants={motionVariants.fadeUp}>
             Good decisions start with the right context. Here are answers to
             common questions about private AI, integrations, and business
             automation.
-          </p>
+          </motion.p>
 
-          <a className="text-link faq-contact-link" href={`${site}/contact/`}>
-            Ask a different question
-            <Arrow />
-          </a>
+          <motion.div variants={motionVariants.fadeUp}>
+            <a className="text-link faq-contact-link" href={`${site}/contact/`}>
+              Ask a different question
+              <Arrow />
+            </a>
+          </motion.div>
 
-          <div className="faq-aside-note">
+          <motion.div
+            className="faq-aside-note"
+            variants={motionVariants.fadeUp}
+          >
             <span className="faq-aside-mark" aria-hidden="true" />
             <span>START WITH WHAT MATTERS TO YOUR BUSINESS</span>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="faq-list">
+        <motion.div className="faq-list" variants={motionVariants.stagger}>
           {faqs.map(([question, answer], index) => {
             const isOpen = open === index;
             const answerId = `faq-answer-${index}`;
             const questionId = `faq-question-${index}`;
 
             return (
-              <article
+              <motion.article
                 className={`faq-item ${isOpen ? "active" : ""}`}
                 key={question}
+                variants={motionVariants.fadeUp}
               >
                 <button
                   className="faq-trigger"
@@ -1596,71 +2480,103 @@ function FAQ() {
                     <p>{answer}</p>
                   </div>
                 </div>
-              </article>
+              </motion.article>
             );
           })}
-        </div>
-      </div>
-    </section>
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 }
 
 function FinalCTA() {
   return (
-    <section
+    <motion.section
       className="final-cta final-cta--refined"
       id="contact-cta"
       aria-labelledby="final-cta-title"
+      variants={motionVariants.section}
+      initial="hidden"
+      whileInView="visible"
+      viewport={revealViewport}
     >
-      <div className="cta-lines" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-      </div>
+      {/* Three logo-inspired strokes animate individually */}
+      <motion.div
+        className="cta-lines"
+        aria-hidden="true"
+        variants={motionVariants.fadeIn}
+      >
+        {[0, 1, 2].map((index) => (
+          <motion.i
+            key={index}
+            custom={index}
+            variants={ctaLineVariants}
+            style={{ transformOrigin: "top center" }}
+          />
+        ))}
+      </motion.div>
 
-      <div className="shell">
-        <div className="final-cta-content">
-          <p className="eyebrow">
-            <span>10</span>
+      <motion.div className="shell" variants={motionVariants.stagger}>
+        <motion.div
+          className="final-cta-content"
+          variants={motionVariants.stagger}
+        >
+          <motion.p className="eyebrow" variants={motionVariants.fadeUp}>
+            <span>11</span>
             <span className="cta-eyebrow-line" aria-hidden="true" />
             START WITH THE RIGHT QUESTION
-          </p>
+          </motion.p>
 
-          <h2 id="final-cta-title">
+          <motion.h2 id="final-cta-title" variants={motionVariants.fadeUp}>
             Where could better intelligence
             <br className="cta-desktop-break" />
             change the way your business works?
-          </h2>
+          </motion.h2>
 
-          <p className="final-cta-copy">
+          <motion.p className="final-cta-copy" variants={motionVariants.fadeUp}>
             Bring us a process that consumes time, a workflow that feels
-            disconnected, or a business problem worth solving. Let's explore
+            disconnected, or a business problem worth solving. Let’s explore
             whether private AI, connected agents, or purposeful automation is
             the right fit.
-          </p>
+          </motion.p>
 
-          <div className="hero-actions final-cta-actions">
-            <a className="button final-cta-primary" href={`${site}/contact/`}>
+          <motion.div
+            className="hero-actions final-cta-actions"
+            variants={motionVariants.stagger}
+          >
+            <motion.a
+              className="button final-cta-primary"
+              href={`${site}/contact/`}
+              variants={motionVariants.fadeUp}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
               <span>Book a Discovery Call</span>
               <Arrow />
-            </a>
+            </motion.a>
 
-            <a
+            <motion.a
               className="button button-secondary final-cta-secondary"
               href="#services"
+              variants={motionVariants.fadeUp}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
             >
               <span>Explore our services</span>
               <Arrow />
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
 
-          <div className="final-cta-footnote">
+          <motion.div
+            className="final-cta-footnote"
+            variants={motionVariants.fadeUp}
+          >
             <span className="final-cta-status" aria-hidden="true" />
             <span>LET'S START WITH THE PROBLEM, NOT THE TECHNOLOGY.</span>
-          </div>
-        </div>
-      </div>
-    </section>
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    </motion.section>
   );
 }
 
@@ -1683,11 +2599,21 @@ function Footer() {
   ];
 
   return (
-    <footer className="site-footer">
-      <div className="shell">
-        <div className="footer-main">
-          {/* Brand and social links */}
-          <div className="footer-brand-column">
+    <motion.footer
+      className="site-footer"
+      variants={motionVariants.section}
+      initial="hidden"
+      whileInView="visible"
+      viewport={revealViewport}
+    >
+      <motion.div className="shell" variants={motionVariants.stagger}>
+        <motion.div className="footer-main" variants={motionVariants.stagger}>
+          {/* Brand */}
+          <motion.div
+            className="footer-brand-column"
+            variants={motionVariants.directionalCard}
+            custom={0}
+          >
             <a
               className="brand footer-brand"
               href="#top"
@@ -1696,7 +2622,7 @@ function Footer() {
               <BrandMark />
 
               <span className="footer-brand-name">
-                Monk Media <em>One</em>
+                Monk Media One
                 <small>AI & SOFTWARE INNOVATION LAB</small>
               </span>
             </a>
@@ -1751,42 +2677,64 @@ function Footer() {
                 </span>
               </a>
             </div>
-          </div>
+          </motion.div>
 
           {/* Services */}
-          <nav className="footer-column footer-services" aria-label="Services">
+          <motion.nav
+            className="footer-column footer-services"
+            aria-label="Services"
+            variants={motionVariants.directionalCard}
+            custom={1}
+          >
             <div className="footer-column-heading">
               <span>01</span>
               <h2>Services</h2>
             </div>
 
             <ul>
-              {serviceLinks.map(([label, href]) => (
-                <li key={label}>
+              {serviceLinks.map(([label, href], index) => (
+                <motion.li
+                  key={label}
+                  variants={motionVariants.fadeUp}
+                  custom={index}
+                >
                   <a href={href}>{label}</a>
-                </li>
+                </motion.li>
               ))}
             </ul>
-          </nav>
+          </motion.nav>
 
           {/* Company */}
-          <nav className="footer-column footer-company" aria-label="Company">
+          <motion.nav
+            className="footer-column footer-company"
+            aria-label="Company"
+            variants={motionVariants.directionalCard}
+            custom={2}
+          >
             <div className="footer-column-heading">
               <span>02</span>
               <h2>Company</h2>
             </div>
 
             <ul>
-              {companyLinks.map(([label, href]) => (
-                <li key={label}>
+              {companyLinks.map(([label, href], index) => (
+                <motion.li
+                  key={label}
+                  variants={motionVariants.fadeUp}
+                  custom={index}
+                >
                   <a href={href}>{label}</a>
-                </li>
+                </motion.li>
               ))}
             </ul>
-          </nav>
+          </motion.nav>
 
-          {/* Contact information */}
-          <div className="footer-column footer-contact">
+          {/* Contact */}
+          <motion.div
+            className="footer-column footer-contact"
+            variants={motionVariants.directionalCard}
+            custom={3}
+          >
             <div className="footer-column-heading">
               <span>03</span>
               <h2>Get in touch</h2>
@@ -1827,11 +2775,11 @@ function Footer() {
               <span>Have a problem worth solving?</span>
               <span aria-hidden="true">↗</span>
             </a>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        {/* Footer bottom bar */}
-        <div className="footer-bottom">
+        {/* Copyright bar */}
+        <motion.div className="footer-bottom" variants={motionVariants.fadeUp}>
           <p>
             © {new Date().getFullYear()} Monk Media One Tech.
             <span> All rights reserved.</span>
@@ -1844,28 +2792,31 @@ function Footer() {
           <a className="footer-back-top" href="#top">
             Back to top <span aria-hidden="true">↑</span>
           </a>
-        </div>
-      </div>
-    </footer>
+        </motion.div>
+      </motion.div>
+    </motion.footer>
   );
 }
 export default function App() {
   return (
-    <>
-      <Header />
-      <main>
-        <Hero />
-        <Problem />
-        <Approach />
-        <Services />
-        <Differentiators />
-        <CaseStudies />
-        <Testimonials />
-        <Technology />
-        <FAQ />
-        <FinalCTA />
-      </main>
-      <Footer />
-    </>
+    <MotionConfig reducedMotion="user">
+      <>
+        <Header />
+        <main>
+          <Hero />
+          <Problem />
+          <Approach />
+          <Services />
+          <Differentiators />
+          <CaseStudies />
+          <TrustedBy />
+          <Testimonials />
+          <Technology />
+          <FAQ />
+          <FinalCTA />
+        </main>
+        <Footer />
+      </>
+    </MotionConfig>
   );
 }
